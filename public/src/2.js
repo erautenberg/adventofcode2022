@@ -107,7 +107,7 @@ const RESULTS2 = {
 };
 
 /**
- * Returns an array of 2D arrays where the first element is the Elf's move and
+ * Returns an array of arrays where the first element is the Elf's move and
  * the second element is your's.
  * 
  * @param {array} rounds 

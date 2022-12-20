@@ -13,7 +13,7 @@ parseData(DAY4, (input) => {
  */
 function runPart1(input) {
   const assignments = parseAssignments(input);
-  return assignments.reduce((acc, curr) => compareSections(...curr) ? ++acc : acc, 0);
+  return assignments.reduce((acc, curr) => compareSections1(...curr) ? ++acc : acc, 0);
 }
 
 /**
@@ -23,7 +23,8 @@ function runPart1(input) {
  * @returns {number}
  */
 function runPart2(input) {
-  return null;
+  const assignments = parseAssignments(input);
+  return assignments.reduce((acc, curr) => compareSections2(...curr) ? ++acc : acc, 0);
 }
 
 /**
@@ -64,13 +65,13 @@ function getArrayFromRange(start, end) {
 }
 
 /**
- * Given two arrays, return true if either array is completed contained inside the other.
+ * Given two arrays, return true if either array is completely contained inside the other.
  * 
  * @param {array} arr1 
  * @param {array} arr2 
  * @returns {boolean}
  */
-function compareSections(arr1, arr2) {
+function compareSections1(arr1, arr2) {
   let maxArr = arr1;
   let minArr = arr2;
   if (arr2.length > arr1.length) {
@@ -78,4 +79,15 @@ function compareSections(arr1, arr2) {
     minArr = arr1;
   }
   return minArr.every(elem => maxArr.includes(elem));
+}
+
+/**
+ * Given two arrays, return true if any value from one array is present in the other.
+ * 
+ * @param {array} arr1 
+ * @param {array} arr2 
+ * @returns {boolean}
+ */
+function compareSections2(arr1, arr2) {
+  return arr1.filter(i => arr2.includes(i)).length > 0;
 }

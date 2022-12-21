@@ -1,7 +1,7 @@
 const DAY4 = 4;
 parseData(DAY4, (input) => {
   const part1 = runPart1(input);
-  const part2 = runPart2(input);;
+  const part2 = runPart2(input);
   showAnswers(DAY4, part1, part2);
 });
 

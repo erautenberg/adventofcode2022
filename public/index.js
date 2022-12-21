@@ -38,6 +38,10 @@ function getPermutations(arr) {
   return permutationsArray;
 }
 
+function transpose(matrix) {
+  return Object.keys(matrix[0]).map(colNumber => matrix.map(rowNumber => rowNumber[colNumber]));
+}
+
 // NAVIGATION
 function makeNavigation(days) {
   let nav = document.getElementById('nav');
@@ -58,5 +62,5 @@ function makeHyperlink(title, location) {
   return list;
 }
 
-const DAYS_COMPLETED = 4;
+const DAYS_COMPLETED = 5;
 makeNavigation(DAYS_COMPLETED);

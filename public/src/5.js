@@ -2,11 +2,12 @@ const DAY5 = 5;
 parseData(DAY5, (input) => {
   const instructionIndex = input.indexOf("");
   const crates = input.slice(0, instructionIndex - 1);
-  // const stacks = input.slice(instructionIndex - 1, instructionIndex);
   const instructions = input.slice(instructionIndex + 1);
-  console.log(instructions);
-  const part1 = runPart1(crates, instructions);
-  const part2 = runPart2();
+  const stacks = generateStacks(crates.map(row => parseCrates(row)));
+  const parsedInstructions = parseInstructions(instructions);
+
+  const part1 = runPart1(stacks, parsedInstructions);
+  const part2 = runPart2(stacks, parsedInstructions);
   showAnswers(DAY5, part1, part2);
 });
 
@@ -16,10 +17,8 @@ parseData(DAY5, (input) => {
  * @param {array} input 
  * @returns {number}
  */
-function runPart1(crates, instructions) {
-  const stacks = generateStacks(crates.map(row => parseCrates(row)));
-  const parsedInstructions = parseInstructions(instructions);
-  const arrangedStacks = rearrangeCrates(stacks, parsedInstructions);
+function runPart1(stacks, instructions) {
+  const arrangedStacks = rearrangeCrates1(stacks, instructions);
   return arrangedStacks.map(stack => stack[stack.length - 1]).join('');
 }
 
@@ -29,8 +28,9 @@ function runPart1(crates, instructions) {
  * @param {array} input 
  * @returns {number}
  */
-function runPart2(input) {
-  return null;
+function runPart2(stacks, instructions) {
+  const arrangedStacks = rearrangeCrates2(stacks, instructions);
+  return arrangedStacks.map(stack => stack[stack.length - 1]).join('');
 }
 
 /**
@@ -79,16 +79,38 @@ function parseInstructions(instructions) {
 
 /**
  * Using the parsed instructions, move crates from one stack to another.
+ * This is for the "CrateMover9000".
  * 
  * @param {array} stacks 
  * @param {arry} instructions 
  * @returns {array}
  */
-function rearrangeCrates(stacks, instructions) {
+function rearrangeCrates1(stacks, instructions) {
+  let newStacks = JSON.parse(JSON.stringify(stacks));
   instructions.forEach(instr => {
+    let destinationStack = newStacks[instr.destination - 1];
+    let targetStack = newStacks[instr.target - 1];
     for (let i=0; i<instr.amount; i++) {
-      stacks[instr.destination - 1].push(stacks[instr.target - 1].pop());
+      destinationStack.push(targetStack.pop());
     }
   });
-  return stacks;
+  return newStacks;
+}
+
+/**
+ * Using the parsed instructions, move crates from one stack to another.
+ * This is for the "CrateMover9001".
+ * 
+ * @param {array} stacks 
+ * @param {arry} instructions 
+ * @returns {array}
+ */
+function rearrangeCrates2(stacks, instructions) {
+  let newStacks = JSON.parse(JSON.stringify(stacks));
+  instructions.forEach(instr => {
+    let destinationStack = newStacks[instr.destination - 1];
+    let targetStack = newStacks[instr.target - 1];
+    destinationStack.push(...targetStack.splice(targetStack.length - instr.amount));
+  });
+  return newStacks;
 }

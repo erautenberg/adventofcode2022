@@ -12,7 +12,7 @@ parseData(DAY5, (input) => {
 });
 
 /**
- * Calculates the answer to Day 4, Part 1
+ * Calculates the answer to Day 5, Part 1
  * 
  * @param {array} input 
  * @returns {number}
@@ -23,7 +23,7 @@ function runPart1(stacks, instructions) {
 }
 
 /**
- * Calculates the answer to Day 4, Part 2
+ * Calculates the answer to Day 5, Part 2
  * 
  * @param {array} input 
  * @returns {number}

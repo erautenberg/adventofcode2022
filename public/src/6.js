@@ -12,7 +12,7 @@ parseData(DAY6, (input) => {
  * @returns {number}
  */
 function runPart1(input) {
-  return findMarker(input[0].split(''), 4);;
+  return findMarker(input[0].split(''), 4);
 }
 
 /**
@@ -22,7 +22,7 @@ function runPart1(input) {
  * @returns {number}
  */
 function runPart2(input) {
-  return null;
+  return findMarker(input[0].split(''), 14);
 }
 
 /**

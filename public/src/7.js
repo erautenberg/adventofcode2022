@@ -1,7 +1,9 @@
 const DAY7 = 7;
 parseData(DAY7, (input) => {
-  const part1 = runPart1(input);
-  const part2 = runPart2(input);
+  const filesystem = parseFilesystem(input);
+  filesystem.size = setDirectorySizes(filesystem);
+  const part1 = runPart1(filesystem);
+  const part2 = runPart2(filesystem);
   showAnswers(DAY7, part1, part2);
 });
 
@@ -11,10 +13,7 @@ parseData(DAY7, (input) => {
  * @param {array} input 
  * @returns {number}
  */
-function runPart1(input) {
-  const filesystem = parseFilesystem(input);
-  filesystem.size = setDirectorySizes(filesystem);
-  console.log(filesystem)
+function runPart1(filesystem) {
   return getSizeTotalBelowCap(filesystem, 100000);
 }
 
@@ -24,8 +23,13 @@ function runPart1(input) {
  * @param {array} input 
  * @returns {number}
  */
-function runPart2(input) {
-  return null;
+function runPart2(filesystem) {
+  const totalDiskSpace = 70000000;
+  const totalNeededSpace = 30000000;
+  const currentFreeSpace = totalDiskSpace - filesystem.size;
+  const totalToFreeUp = totalNeededSpace - currentFreeSpace;
+  const possibleSizes = findSizeToFreeUp(filesystem, totalToFreeUp, [ filesystem.size ]);
+  return Math.min(...possibleSizes);
 }
 
 /**
@@ -136,4 +140,24 @@ function getSizeTotalBelowCap(folder, cap) {
     }
     return sum;
   }, 0);
+}
+
+/**
+ * Returns an array of the directory sizes that could be deleted in order to free up enough disk space.
+ * 
+ * @param {object} folder 
+ * @param {number} neededSpace 
+ * @param {array} possibleSizes 
+ * @returns {array}
+ */
+function findSizeToFreeUp(folder, neededSpace, possibleSizes) {
+  folder.children.forEach(item => {
+    if (item.isDirectory) {
+      possibleSizes = findSizeToFreeUp(item, neededSpace, possibleSizes);
+      if (item.size >= neededSpace) {
+        possibleSizes.push(item.size);
+      }
+    }
+  })
+  return possibleSizes;
 }

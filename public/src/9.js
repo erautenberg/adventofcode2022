@@ -16,6 +16,9 @@ parseData(DAY9, (input) => {
  * @returns {number}
  */
 function runPart1(input) {
+  // This can also be replaced with the method for multiple tails
+  // (see Part 2) as it was designed to take any number of knots.
+  // i.e. "runMotionsMultiTail(input, 2).size"
   return runMotions(input).size;
 }
 
@@ -26,7 +29,7 @@ function runPart1(input) {
  * @returns {number}
  */
 function runPart2(input) {
-  return null;
+  return runMotionsMultiTail(input, 10).size;
 }
 
 /**
@@ -89,4 +92,84 @@ function runMotions(input) {
   });
   
   return visited;
+}
+
+/**
+ * Given a list of instrucitons for the Head and Tail of the knots to follow,
+ * as well as a total number of knots, log each newly visited point the LAST Tail traverses in a Set.
+ * 
+ * @param {array} input 
+ * @param {number} knotLength
+ * @returns {Set}
+ */
+function runMotionsMultiTail(input, knotLength) {
+  const visited = new Set();
+  // let head = { x: 0, y: 0 };
+  let knots = new Array(knotLength).fill().map(() => ({ x: 0, y: 0 }));
+  // let head = knots[0];
+  let endTail = knots[knotLength - 1];
+  visited.add(`${endTail.x}, ${endTail.y}`);
+
+  input.forEach(instruction => {
+    let changeX = 0;
+    let changeY = 0;
+
+    if (instruction.direction === 'L') {
+      changeX = -1;
+    } else if (instruction.direction === 'R') {
+      changeX = 1;
+    } else if (instruction.direction === 'U') {
+      changeY = 1;
+    } else if (instruction.direction === 'D') {
+      changeY = -1;
+    }
+
+    for (let i=0; i < instruction.distance; i++) {
+      knots[0] = { x: knots[0].x + changeX, y: knots[0].y + changeY };
+  
+      for (let i=1; i<knots.length; i++) {
+        knots[i] = updateTails(knots[i - 1], knots[i]);
+        if (i === knots.length - 1) {
+          visited.add(`${endTail.x}, ${endTail.y}`);
+        }
+      }
+    }
+  });
+  
+  return visited;
+}
+
+/**
+ * Move the knot to ensure it is always within 1 space of the Head.
+ * 
+ * @param {Object} head 
+ * @param {Object} tail 
+ * @returns {Object}
+ */
+function updateTails(head, tail) {
+  // if the Tail is not within 1 space of the Head
+  if (Math.abs(head.x - tail.x) > 1 || Math.abs(head.y - tail.y) > 1) {
+    if (head.x > tail.x && head.y === tail.y) { // same row, H to right of T
+      tail.x++;
+    } else if (head.x < tail.x && head.y === tail.y) { // same row, H to left of T
+      tail.x--;
+    } else if (head.y > tail.y && head.x === tail.x) { // same column, H above T
+      tail.y++;
+    } else if (head.y < tail.y && head.x === tail.x) { // same column, H below T
+      tail.y--;
+    } else if (head.x > tail.x && head.y > tail.y) { // H diagonally right and above T
+      tail.x++;
+      tail.y++;
+    } else if (head.x < tail.x && head.y > tail.y) { // H diagonally left and above T
+      tail.x--;
+      tail.y++;
+    } else if (head.x > tail.x && head.y < tail.y) { // H diagonally right and below T
+      tail.x++;
+      tail.y--;
+    } else if (head.x < tail.x && head.y < tail.y) { // H diagonally left and below T
+      tail.x--;
+      tail.y--;
+    }
+  }
+  return tail;
 }

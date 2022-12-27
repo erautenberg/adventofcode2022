@@ -13,7 +13,8 @@ parseData(DAY8, (input) => {
  * @returns {number}
  */
 function runPart1(heights) {
-  return sumVisibleTrees(getVisibility(heights));
+  const visibility = getVisibility(heights);
+  return sumVisibleTrees(visibility);
 }
 
 /**
@@ -23,7 +24,9 @@ function runPart1(heights) {
  * @returns {number}
  */
 function runPart2(heights) {
-  return null;
+  const distances = getVisibilityDistances(heights);
+  const scores = getScenicScore(distances);
+  return findMaxScore(scores);
 }
 
 /**
@@ -83,4 +86,92 @@ function sumVisibleTrees(visibility) {
   return visibility.reduce((acc, curr) =>
     acc + curr.filter(isVisible => isVisible === 1).length
   , 0);
+}
+
+/**
+ * Given a 2D array of tree heights, return a 3D array where the third dimension contains 4 elements
+ * representing the visibility distance from the tree at the location (left, right, top, bottom);
+ * 
+ * @param {array} heightsByRow 
+ * @returns {array}
+ */
+function getVisibilityDistances(heightsByRow) {
+  const heightsByColumn = transpose(heightsByRow);
+  let visibility = Array.apply(null, new Array(heightsByRow.length)).map(() => new Array(heightsByColumn.length).fill(0));
+  
+  for (let row=0; row<heightsByRow.length; row++) {
+    for (let col=0; col<heightsByRow[row].length; col++) {
+      let distances = [];
+      if (
+        row === 0 ||
+        row === heightsByRow.length - 1 ||
+        col === 0 ||
+        col === heightsByColumn.length - 1
+      ) {
+        distances = new Array(4).fill(1);
+      } else {
+        const currRow = heightsByRow[row];
+        const currColumn = heightsByColumn[col];
+        const currHeight = currRow[col];
+
+        distances = [
+          getVisibilityDistance(currHeight, currRow.slice(0, col).reverse()), // left
+          getVisibilityDistance(currHeight, currRow.slice(col + 1)), // right
+          getVisibilityDistance(currHeight, currColumn.slice(0, row).reverse()), // up
+          getVisibilityDistance(currHeight, currColumn.slice(row + 1)), // down
+        ];
+      }
+      
+      visibility[row][col] = distances;
+    }
+  }
+
+  return visibility;
+}
+
+/**
+ * Calculates the visibility distance based on a height and
+ * the heights of the trees in a line from it.
+ * 
+ * @param {number} tree 
+ * @param {array} heights 
+ * @returns {number}
+ */
+function getVisibilityDistance(tree, heights) {
+  let i = 0;
+  while (i < heights.length) {
+    if (tree > heights[i]) {
+      i++;
+    }
+    if (tree <= heights[i]) {
+      i++;
+      break;
+    }
+  }
+  return i;
+}
+
+/**
+ * Creates a 2D array where each number represents the scenic score of a tree
+ * by multipling the 4 visibility distances of each tree.
+ * 
+ * @param {array} allDistances 
+ * @returns {array}
+ */
+function getScenicScore(allDistances) {
+  return allDistances.map(row =>
+    row.map(distances =>
+      distances.reduce((acc, curr) => acc * curr, 1)
+    )
+  );
+}
+
+/**
+ * Find the highest number in a 2D array.
+ * 
+ * @param {array} scores 
+ * @returns {number}
+ */
+function findMaxScore(scores) {
+  return Math.max(...scores.map(row => Math.max(...row)));
 }
